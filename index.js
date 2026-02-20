@@ -93,3 +93,8 @@ Location: ${location}`;
 
   res.send("Emergency logged & SMS triggered");
 });
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(`✅ LP Backend running on port ${PORT}`);
+});
