@@ -8,11 +8,16 @@ app.use(express.json());
 
 const JWT_SECRET = "lp_secret_key";
 
+/* USERS (temporary – DB later) */
 const users = [
   { id: 1, username: "admin", password: "admin123", role: "admin" },
   { id: 2, username: "hotel1", password: "hotel123", role: "hotel", hotel: "Grand Chennai" }
 ];
 
+/* STORAGE (temporary – DB later) */
+const dailyReports = [];
+
+/* AUTH MIDDLEWARE */
 function auth(req, res, next) {
   const token = req.headers.authorization;
   if (!token) return res.sendStatus(401);
@@ -24,6 +29,7 @@ function auth(req, res, next) {
   }
 }
 
+/* LOGIN */
 app.post("/login", (req, res) => {
   const user = users.find(
     u => u.username === req.body.username && u.password === req.body.password
@@ -34,6 +40,29 @@ app.post("/login", (req, res) => {
   res.json({ token, role: user.role });
 });
 
+/* DAILY REPORT SUBMISSION */
+app.post("/daily-report", auth, (req, res) => {
+  if (req.user.role !== "hotel") return res.sendStatus(403);
+
+  const report = {
+    hotel: req.user.hotel,
+    date: new Date().toISOString().split("T")[0],
+    ...req.body
+  };
+
+  dailyReports.push(report);
+  console.log("📄 Daily Report:", report);
+
+  res.send("Daily report submitted");
+});
+
+/* ADMIN – VIEW REPORTS */
+app.get("/daily-report", auth, (req, res) => {
+  if (req.user.role !== "admin") return res.sendStatus(403);
+  res.json(dailyReports);
+});
+
+/* EMERGENCY */
 app.post("/emergency", auth, (req, res) => {
   console.log("🚨 EMERGENCY:", req.body, "Hotel:", req.user.hotel);
   res.send("Emergency logged");
