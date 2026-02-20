@@ -78,10 +78,10 @@ Location: ${location}`;
     await axios.post("https://www.fast2sms.com/dev/bulkV2", {
       route: "q",
       message,
-      numbers: "XXXXXXXXXX"
+      numbers: "9884889138"
     }, {
       headers: {
-        authorization: "FAST2SMS_API_KEY",
+        authorization: "nB4m0WS7FLhNHl81ofUCjIswctkvqbArVy9eJa3YPR6EKQzDgxaIYk1KDlxoRSPTmUuEO8fGAji5LXbW",
         "Content-Type": "application/json"
       }
     });
