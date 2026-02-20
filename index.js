@@ -63,13 +63,33 @@ app.get("/daily-report", auth, (req, res) => {
 });
 
 /* EMERGENCY */
-app.post("/emergency", auth, (req, res) => {
-  console.log("🚨 EMERGENCY:", req.body, "Hotel:", req.user.hotel);
-  res.send("Emergency logged");
-});
+const axios = require("axios");
 
-app.get("/", (req, res) => {
-  res.send("Loss Prevention Backend Running");
-});
+app.post("/emergency", auth, async (req, res) => {
+  const { category, severity, location } = req.body;
 
-app.listen(3000, () => console.log("Server started"));
+  const message = `🚨 EMERGENCY ALERT 🚨
+Hotel: ${req.user.hotel}
+Type: ${category}
+Severity: ${severity}
+Location: ${location}`;
+
+  try {
+    await axios.post("https://www.fast2sms.com/dev/bulkV2", {
+      route: "q",
+      message,
+      numbers: "XXXXXXXXXX"
+    }, {
+      headers: {
+        authorization: "FAST2SMS_API_KEY",
+        "Content-Type": "application/json"
+      }
+    });
+
+    console.log("SMS sent");
+  } catch (err) {
+    console.log("SMS failed", err.message);
+  }
+
+  res.send("Emergency logged & SMS triggered");
+});
